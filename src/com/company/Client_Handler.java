@@ -1,18 +1,22 @@
 package com.company;
 
 import source.Desafio;
+import source.User;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
  * Created by Paivex on 2/17/2017.
  */
 public class Client_Handler implements Runnable{
-    private LinkedList<Desafio> desafios;
+
+    private String input;
+    private String[] inputArray;
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
@@ -20,48 +24,51 @@ public class Client_Handler implements Runnable{
 
     @Override
     public void run() {
-
+        scheduler();
     }
 
     public Client_Handler(Socket socket) {
-        try {
-            this.socket = socket;
-            System.out.print("client arrived = " + socket.getInetAddress());
+        this.socket = socket;
+    }
+    Object a = new Object();
 
-            ois = new ObjectInputStream(socket.getInputStream());
+    private void scheduler() {
 
-            String as = (String) ois.readObject();
+        input = (String) receive();
+        inputArray = input.split(" ");
+        if (inputArray[0].equals("Search")) search();
+        else if (inputArray[0].equals("Add")) add();
+        else if (inputArray[0].equals("Pedido")) pedido();
+        //else if (inputArray[0].equals("Profile")) profile();
+        //else if (inputArray[0].equals("Anuncios")) anuncios();
+    }
 
-            //"search Nome paiva Dificuldade 3 Distancia 5"
-
-            String[] array = as.split(" ");
-
-            if(array[0].equals("search")) search(array);
-            //else if(array[0].equals("profile")) profile();
-            //else if(array[0].equals("anuncios")) anuncios();
-
-            ois.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    private void add() {
+        if (inputArray[1].equals("Desafio")) {
+            Desafio desafio = bd.add((Desafio) receive());
+            desafio.getAutor().getDesafiosCriados().add(desafio);
+            for (User user : desafio.getUsersDesafiados()) user.getDesafiosContactos().add(desafio);
         }
     }
 
-    private void search(String[] array) {
-        if (array.length == 1) {
-            send(desafios);
+    private void pedido() {
+
+    }
+
+    private void search() {
+        if (inputArray.length == 1) {
+            send(bd.getDesafios());
         }
         else {
             LinkedList<Desafio> out = new LinkedList();
-            for (Desafio e : desafios) {
+            for (Desafio e : bd.getDesafios) {
                 flag = false;
-                for (int i = 1; i < array.length && !flag; i += 2) {
-                    if (array[i].equals("Nome")) {
-                        if (!e.getNome().toLowerCase().contains(array[i + 1].toLowerCase())) flag = true;
-                    } else if (array[i].equals("Dificuldade")) {
-                        if (!(e.getDificuldade() == Integer.parseInt(array[i + 1]))) flag = true;
-                    } else if (array[i].equals("Distancia")) {
+                for (int i = 1; i < inputArray.length && !flag; i += 2) {
+                    if (inputArray[i].equals("Nome")) {
+                        if (!e.getNome().toLowerCase().contains(inputArray[i + 1].toLowerCase())) flag = true;
+                    } else if (inputArray[i].equals("Dificuldade")) {
+                        if (!(e.getDificuldade() == Integer.parseInt(inputArray[i + 1]))) flag = true;
+                    } else if (inputArray[i].equals("Distancia")) {
 
                     }
                 }
@@ -82,14 +89,16 @@ public class Client_Handler implements Runnable{
     }
 
     public Object receive() {
+        Object out = null;
         try {
             ois = new ObjectInputStream(socket.getInputStream());
-            return ois.readObject();
+            out = ois.readObject();
+            ois.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return null;
+        return out;
     }
 }
