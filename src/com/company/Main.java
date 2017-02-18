@@ -12,11 +12,12 @@ public class Main {
         boolean flag = true;
         try {
 
+
             socket = new ServerSocket(port);
 
             System.out.print("running on " + socket.getInetAddress());
 
-            while(flag) new Thread(socket.accept());
+            while(flag) new Client_Handler(socket.accept());
 
         } catch (IOException e) {
             flag = false;

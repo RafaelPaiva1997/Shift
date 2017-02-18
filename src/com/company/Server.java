@@ -18,7 +18,7 @@ public class Server {
         boolean flag = true;
         try {
             socket = new ServerSocket(port);
-            while(flag) new Thread(socket.accept());
+            while(flag) new Client_Handler(socket.accept());
 
         } catch (IOException e) {
             flag = false;

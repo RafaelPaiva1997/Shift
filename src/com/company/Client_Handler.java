@@ -1,25 +1,31 @@
 package com.company;
 
+import source.Desafio;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 
 /**
  * Created by Paivex on 2/17/2017.
  */
-public class Thread {
+public class Client_Handler implements Runnable{
     private LinkedList<Desafio> desafios;
+    private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private boolean flag;
 
-    public Thread(Socket socket) {
+    @Override
+    public void run() {
+
+    }
+
+    public Client_Handler(Socket socket) {
         try {
+            this.socket = socket;
             System.out.print("client arrived = " + socket.getInetAddress());
 
             ois = new ObjectInputStream(socket.getInputStream());
@@ -52,10 +58,9 @@ public class Thread {
                 flag = false;
                 for (int i = 1; i < array.length && !flag; i += 2) {
                     if (array[i].equals("Nome")) {
-                        if (!e.getNome().contains(array[i + 1]))
-                            flag = true; //se o array[i+1] nao estiver contido no nome de e, flag = false
+                        if (!e.getNome().toLowerCase().contains(array[i + 1].toLowerCase())) flag = true;
                     } else if (array[i].equals("Dificuldade")) {
-                        if (!e.getDificuldade().equals(array[i + 1])) flag = true;
+                        if (!(e.getDificuldade() == Integer.parseInt(array[i + 1]))) flag = true;
                     } else if (array[i].equals("Distancia")) {
 
                     }
@@ -64,5 +69,27 @@ public class Thread {
             }
             send(out);
         }
+    }
+
+    public void send(Object object) {
+        try {
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(object);
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Object receive() {
+        try {
+            ois = new ObjectInputStream(socket.getInputStream());
+            return ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
