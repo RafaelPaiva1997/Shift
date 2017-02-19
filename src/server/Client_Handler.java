@@ -36,7 +36,7 @@ public class Client_Handler implements Runnable{
         System.out.println("Waiting");
         input = (String) receive();
         inputArray = input.split(" ");
-        if (inputArray[0].equals("Search")) ;//search();
+        if (inputArray[0].equals("Search")) search();
         else if (inputArray[0].equals("Add")) add();
         else if (inputArray[0].equals("Pedido")) pedido();
         else if (inputArray[0].equals("Confirmar")) confirmar();
@@ -47,11 +47,11 @@ public class Client_Handler implements Runnable{
     private void add() {
         if (inputArray[1].equals("Desafio")) {
             Desafio desafio = (Desafio) receive();
-            //bd.add(desafio);
+            Main.bd.add(desafio);
             int id = (int) receive();
-            //desafio.setAutor((User) bd.get(id));
+            desafio.setAutor((User) Main.bd.get(id));
             int[] ids = (int[]) receive();
-            //for (User user : (User[]) bd.get(ids)) user.getDesafiosContactos().add(desafio);
+            for (User user : (User[]) Main.bd.get(ids)) user.getDesafiosContactos().add(desafio);
         }
     }
 
@@ -69,28 +69,33 @@ public class Client_Handler implements Runnable{
         pedido.getDesafiante().getPedidos().remove(pedido);
     }
 
-    /*private void search() {
+    private void search() {
+        System.out.println(Arrays.toString(inputArray));
         if (inputArray.length == 1) {
-            send(bd.getDesafios());
+            send(Main.bd.getDesafios());
         }
         else {
             LinkedList<Desafio> out = new LinkedList();
-            for (Desafio e : bd.getDesafios) {
-                flag = false;
-                for (int i = 1; i < inputArray.length && !flag; i += 2) {
+            for (Desafio e : Main.bd.getDesafios()) {
+                flag = true;
+                for (int i = 1; i < inputArray.length && flag; i += 2) {
                     if (inputArray[i].equals("Nome")) {
-                        if (!e.getNome().toLowerCase().contains(inputArray[i + 1].toLowerCase())) flag = true;
+                        if (!e.getNome().toLowerCase().contains(inputArray[i + 1].toLowerCase())) flag = false;
                     } else if (inputArray[i].equals("Dificuldade")) {
-                        if (!(e.getDificuldade() == Integer.parseInt(inputArray[i + 1]))) flag = true;
-                    } else if (inputArray[i].equals("Distancia")) {
-
+                        if (!(e.getDificuldade() == Integer.parseInt(inputArray[i + 1]))) flag = false;
+                    } else if (inputArray[i].equals("Id")) {
+                        if (!(Integer.toString(e.getId()).contains(inputArray[i + 1]))) flag = false;
+                    } else if (inputArray[i].equals("Autor")) {
+                        if (!(e.getAutor().getUsarname().toLowerCase().contains(inputArray[i + 1].toLowerCase()))) flag = false;
+                    } else if (inputArray[i].equals("Descricao")) {
+                        if (!(e.getDescricao().toLowerCase().contains(inputArray[i + 1].toLowerCase()))) flag = false;
                     }
                 }
-                if (!flag) out.add(e);
+                if (flag) out.add(e);
             }
             send(out);
         }
-    }*/
+    }
 
     public void send(Object object) {
         try {

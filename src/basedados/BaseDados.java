@@ -7,6 +7,7 @@ import source.User;
 import java.io.*;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * Created by Paivex on 2/19/2017.
@@ -85,6 +86,31 @@ public class BaseDados {
 
     public boolean remove(Local e) {
         return locais.remove(e);
+    }
+
+    public Object get(int id) {
+        for (Desafio e : desafios) {
+            if (e.getId() == id) {
+                return e;
+            }
+        }
+        for (User e : users) {
+            if (e.getId() == id) {
+                return e;
+            }
+        }
+        for (Local e : locais) {
+            if (e.getId() == id) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public Object[] get(int[] ids) {
+        Object[] out = new Object[ids.length];
+        for (int i = 0; i < ids.length; i++) out[i] = get(ids[i]);
+        return out;
     }
 
     public LinkedList<Desafio> getDesafios() {

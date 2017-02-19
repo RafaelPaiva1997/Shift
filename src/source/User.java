@@ -53,4 +53,10 @@ public abstract class User implements Serializable {
     public LinkedList<Local> getLocaisFavoritos() {
         return locaisFavoritos;
     }
+
+    public abstract String getUsarname();
+
+    public abstract String getName();
+
+    public abstract int getIdade();
 }
