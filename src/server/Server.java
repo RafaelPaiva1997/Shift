@@ -1,4 +1,4 @@
-package com.company;
+package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,7 +18,10 @@ public class Server {
         boolean flag = true;
         try {
             socket = new ServerSocket(port);
-            while(flag) new Client_Handler(socket.accept());
+            while(flag) {
+                Thread thread = new Thread(new Client_Handler(socket.accept()));
+                thread.run();
+            }
 
         } catch (IOException e) {
             flag = false;

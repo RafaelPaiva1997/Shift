@@ -1,11 +1,12 @@
 package source;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
  * Created by Paivex on 2/18/2017.
  */
-public abstract class Desafio {
+public abstract class Desafio implements Serializable {
 
     protected int id;
     protected User autor;
@@ -16,6 +17,8 @@ public abstract class Desafio {
     protected LinkedList<User> usersCompletaram;
     protected LinkedList<Pedido> pedidos;
 
+    public Desafio() {
+    }
 
     public Desafio(int id, User autor, String nome, String descricao, int dificuldade) {
         this.id = id;
@@ -60,4 +63,24 @@ public abstract class Desafio {
     }
 
     public abstract Local getLocal();
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setAutor(User autor) {
+        this.autor = autor;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public void setDificuldade(int dificuldade) {
+        this.dificuldade = dificuldade;
+    }
 }

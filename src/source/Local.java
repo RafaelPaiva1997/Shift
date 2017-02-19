@@ -1,7 +1,9 @@
 package source;
 
+import java.io.Serializable;
+
 /**
  * Created by Paivex on 2/18/2017.
  */
-public class Local {
+public class Local implements Serializable {
 }

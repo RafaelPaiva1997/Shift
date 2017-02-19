@@ -1,13 +1,12 @@
 package source;
 
-import sun.awt.image.ImageWatched;
-
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
  * Created by Paivex on 2/18/2017.
  */
-public abstract class User {
+public abstract class User implements Serializable {
 
     protected int id;
     protected LinkedList<User> contactos;

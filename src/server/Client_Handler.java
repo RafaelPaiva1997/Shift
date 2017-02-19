@@ -1,6 +1,7 @@
-package com.company;
+package server;
 
 import source.Desafio;
+import source.Pedido;
 import source.User;
 
 import java.io.IOException;
@@ -30,32 +31,45 @@ public class Client_Handler implements Runnable{
     public Client_Handler(Socket socket) {
         this.socket = socket;
     }
-    Object a = new Object();
 
     private void scheduler() {
-
+        System.out.println("Waiting");
         input = (String) receive();
         inputArray = input.split(" ");
-        if (inputArray[0].equals("Search")) search();
+        if (inputArray[0].equals("Search")) ;//search();
         else if (inputArray[0].equals("Add")) add();
         else if (inputArray[0].equals("Pedido")) pedido();
+        else if (inputArray[0].equals("Confirmar")) confirmar();
         //else if (inputArray[0].equals("Profile")) profile();
         //else if (inputArray[0].equals("Anuncios")) anuncios();
     }
 
     private void add() {
         if (inputArray[1].equals("Desafio")) {
-            Desafio desafio = bd.add((Desafio) receive());
-            desafio.getAutor().getDesafiosCriados().add(desafio);
-            for (User user : desafio.getUsersDesafiados()) user.getDesafiosContactos().add(desafio);
+            Desafio desafio = (Desafio) receive();
+            //bd.add(desafio);
+            int id = (int) receive();
+            //desafio.setAutor((User) bd.get(id));
+            int[] ids = (int[]) receive();
+            //for (User user : (User[]) bd.get(ids)) user.getDesafiosContactos().add(desafio);
         }
     }
 
     private void pedido() {
-
+        Pedido pedido = (Pedido) receive();
+        pedido.getDesafiante().getPedidos().add(pedido);
     }
 
-    private void search() {
+    private void confirmar() {
+        Pedido pedido = (Pedido) receive();
+        if (pedido.isDone()) {
+            pedido.getDesafio().getUsersCompletaram().add(pedido.getDesafiado());
+            pedido.getDesafiado().getDesafiosFeitos().add(pedido.getDesafio());
+        }
+        pedido.getDesafiante().getPedidos().remove(pedido);
+    }
+
+    /*private void search() {
         if (inputArray.length == 1) {
             send(bd.getDesafios());
         }
@@ -76,13 +90,13 @@ public class Client_Handler implements Runnable{
             }
             send(out);
         }
-    }
+    }*/
 
     public void send(Object object) {
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(object);
-            oos.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,7 +107,7 @@ public class Client_Handler implements Runnable{
         try {
             ois = new ObjectInputStream(socket.getInputStream());
             out = ois.readObject();
-            ois.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
